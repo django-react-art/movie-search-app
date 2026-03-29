@@ -21,5 +21,26 @@ The app fetches movie data in real-time as you type, and handles errors graceful
 
 1. Clone the repository  
    ```bash
-   git clone <your-repo-url>
-   cd <your-repo-folder>
+   git clone https://github.com/django-react-art/movie-search-app
+   cd https://github.com/django-react-art/movie-search-app
+
+2. Install dependencies
+    npm install
+
+3. Start the development server
+    npm start
+
+4. Usage
+    Type a movie name in the search box
+    Results appear live as you type
+    If the search is too broad or no movies are found, you’ll see an error message
+
+5. Future Improvements
+    Add debounce to limit API calls while typing
+    Improve UI styling
+    Add movie details page
+
+License
+This project is open source and free to use.
+
+Built with ❤️ using React and OMDb API
