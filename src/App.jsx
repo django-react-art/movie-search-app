@@ -3,9 +3,10 @@ import { Grid, Card, CardMedia, CardContent, Typography, Modal, Box } from "@mui
 
 function App(){
   const [movies, setMovies] = useState([]);
-  const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [query, setQuery] = useState("");
+
 
   const fetchMovies = async(query) => {
     if(!query){
@@ -13,6 +14,7 @@ function App(){
       setMovies([]);
       return;
     }
+    setMovies([]);
     try{
     const response = await fetch(
       `http://www.omdbapi.com/?apikey=18ef985b&s=${query}`
@@ -30,13 +32,33 @@ function App(){
       console.error(error);
     }
   }
-  useEffect(() => {
-    fetchMovies(input);
-  }, [input]);
+  useEffect( () => {
+    if(!query.trim()) return;
+    const timer = setTimeout(() => {
+      fetchMovies(query);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const fetchMovieDetails = async (id) => {
+    try{
+      const response = await fetch (
+        `http://www.omdbapi.com/?apikey=18ef985b&i=${id}`
+      )
+      const data = await response.json();
+      setSelectedMovie(data);
+    }catch(error) {
+      console.error(error);
+    }
+  };
 
   return(
     <div>
-      <input type="text" placeholder="Enter Movie Name Here" value = {input} onChange={(e)=> setInput(e.target.value)} />
+      <input type="text" 
+      placeholder="Enter Movie Name Here" 
+      value = {query} 
+      onChange={(e)=> setQuery(e.target.value)} />
+      <button onClick={() => fetchMovieDetails(movie.imdbID)}> Search </button>
     <Grid container spacing = {3}>
       <Modal
   open={!!selectedMovie}
@@ -79,6 +101,18 @@ function App(){
         <Typography>
           Type: {selectedMovie.Type}
         </Typography>
+
+        <Typography sx={{ mt: 2 }}>
+  Genre: {selectedMovie.Genre}
+</Typography>
+
+<Typography>
+  Actors: {selectedMovie.Actors}
+</Typography>
+
+<Typography sx={{ mt: 2 }}>
+  Plot: {selectedMovie.Plot}
+</Typography>
       </>
     )}
   </Box>
