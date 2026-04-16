@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Grid, Card, CardMedia, CardContent, Typography, Modal, Box } from "@mui/material";
+import { Grid, Card, CardMedia, CardContent, Typography, Modal, Box, CircularProgress } from "@mui/material";
 
 function App(){
   const [movies, setMovies] = useState([]);
   const [error, setError] = useState("");
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [query, setQuery] = useState("");
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
 
   const fetchMovies = async(query) => {
@@ -42,6 +43,7 @@ function App(){
 
   const fetchMovieDetails = async (id) => {
     try{
+      setLoadingDetails(true);
       const response = await fetch (
         `http://www.omdbapi.com/?apikey=18ef985b&i=${id}`
       )
@@ -49,6 +51,9 @@ function App(){
       setSelectedMovie(data);
     }catch(error) {
       console.error(error);
+    }
+    finally{
+      setLoadingDetails(false);
     }
   };
 
@@ -58,7 +63,6 @@ function App(){
       placeholder="Enter Movie Name Here" 
       value = {query} 
       onChange={(e)=> setQuery(e.target.value)} />
-      <button onClick={() => fetchMovieDetails(movie.imdbID)}> Search </button>
     <Grid container spacing = {3}>
       <Modal
   open={!!selectedMovie}
@@ -77,7 +81,12 @@ function App(){
       boxShadow: 24,
     }}
   >
-    {selectedMovie && (
+    {loadingDetails? (
+      <Box sx={{display: "flex", justifyContent: "center", mt: 2}}>
+        <CircularProgress />
+      </Box>
+    ) : (
+      selectedMovie && (
       <>
         <Typography variant="h6" gutterBottom>
           {selectedMovie.Title}
@@ -114,6 +123,7 @@ function App(){
   Plot: {selectedMovie.Plot}
 </Typography>
       </>
+      )
     )}
   </Box>
 </Modal>
@@ -122,14 +132,9 @@ function App(){
       ) : ( 
       movies.map((movie) => (
         <Grid item xs = {12} sm = {6} md = {4} key = {movie.imdbID}>
-          <Card onClick = { () => setSelectedMovie(movie)}
-          sx = {{
-            cursor: "pointer", 
-            transition: "0.3s",
-            "&:hover": {
-              transform: "scale(1.05)",
-              boxShadow: 6,
-            },
+          <Card onClick = { () => {
+            setSelectedMovie({});
+            fetchMovieDetails(movie.imdbID);
           }}>
   <CardMedia
     component="img"
