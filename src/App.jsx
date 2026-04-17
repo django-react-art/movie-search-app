@@ -7,21 +7,25 @@ function App(){
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [query, setQuery] = useState("");
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [loading, setLoading] = useState(false);
 
 
   const fetchMovies = async(query) => {
-    if(!query){
+    if(!query.trim()){
       setError("Search Empty!");
       setMovies([]);
       return;
     }
-    setMovies([]);
     try{
+      setLoading(true);
+      setHasSearched(true);
     const response = await fetch(
       `http://www.omdbapi.com/?apikey=18ef985b&s=${query}`
     )
     const data = await response.json();
     if (data.Response === "False") {
+      setMovies([]);
       setError(data.Error);
     }
     else{
@@ -31,6 +35,9 @@ function App(){
     }}
     catch(error){
       console.error(error);
+    }
+    finally{
+      setLoading(false);
     }
   }
   useEffect( () => {
@@ -74,7 +81,10 @@ function App(){
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%)",
-      width: 400,
+      width: "90%",
+      maxWidth: 600,
+      maxHeight: "80vh",
+      overflowY: "auto",
       bgcolor: "background.paper",
       p: 3,
       borderRadius: 2,
